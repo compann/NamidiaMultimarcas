@@ -1,0 +1,127 @@
+/* ============================================================
+   Painel admin — reaproveita as variáveis de marca de style.css
+   ============================================================ */
+
+.admin-body{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+
+/* ---------- TELA DE LOGIN ---------- */
+.login-box{
+  width:100%;max-width:380px;
+  background:linear-gradient(180deg,var(--carvao),#0d0c0f);
+  border:1px solid var(--linha-forte);border-radius:12px;
+  padding:40px 32px;text-align:center;
+}
+.login-box img{width:64px;height:64px;margin:0 auto 18px}
+.login-box h1{font-family:"Italiana",serif;font-weight:400;letter-spacing:.16em;font-size:1.3rem;margin-bottom:4px}
+.login-box p.sub{font-size:.72rem;letter-spacing:.3em;color:var(--ouro);text-transform:uppercase;margin-bottom:28px}
+.login-box label{display:block;text-align:left;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--texto-suave);margin:14px 0 8px}
+.login-box input{
+  width:100%;background:#0c0b0e;border:1px solid var(--linha);border-radius:6px;
+  color:var(--marfim);padding:12px 14px;font-family:inherit;font-size:.95rem;
+}
+.login-box input:focus{outline:none;border-color:var(--ouro)}
+.btn-gold{
+  width:100%;margin-top:22px;border:none;border-radius:8px;padding:14px;
+  font-size:.9rem;font-weight:600;letter-spacing:.06em;color:var(--onyx);
+  background:linear-gradient(180deg,var(--champanhe),var(--ouro) 55%,var(--ouro-antigo));
+}
+.btn-gold:hover{filter:brightness(1.06)}
+.login-erro{color:#e6a4a4;font-size:.82rem;margin-top:14px;min-height:1.2em}
+
+/* ---------- DASHBOARD ---------- */
+.admin-shell{display:none;width:100%;max-width:1040px;margin:0 auto;padding:32px 20px 80px}
+.admin-shell.open{display:block}
+
+.admin-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:14px}
+.admin-top .who{display:flex;align-items:center;gap:12px}
+.admin-top img{width:38px;height:38px}
+.admin-top h1{font-family:"Italiana",serif;font-weight:400;letter-spacing:.12em;font-size:1.15rem}
+.admin-top .email{font-size:.75rem;color:var(--texto-suave)}
+.btn-sair{
+  border:1px solid var(--linha);background:transparent;color:var(--texto-suave);
+  border-radius:999px;padding:8px 18px;font-size:.78rem;letter-spacing:.05em;
+}
+.btn-sair:hover{color:var(--marfim);border-color:var(--linha-forte)}
+
+.admin-grid{display:grid;grid-template-columns:380px 1fr;gap:28px}
+@media (max-width:860px){ .admin-grid{grid-template-columns:1fr} }
+
+.painel{
+  background:linear-gradient(180deg,var(--carvao),#0e0d10);
+  border:1px solid var(--linha);border-radius:10px;padding:24px;
+}
+.painel h2{font-family:"Instrument Serif",serif;font-weight:400;font-size:1.3rem;margin-bottom:18px}
+
+.field{margin-bottom:16px}
+.field label{display:block;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--texto-suave);margin-bottom:7px}
+input[type=text], input[type=number], select, textarea{
+  width:100%;background:#0c0b0e;border:1px solid var(--linha);border-radius:6px;
+  color:var(--marfim);padding:11px 13px;font-family:inherit;font-size:.92rem;
+}
+input:focus, select:focus, textarea:focus{outline:none;border-color:var(--ouro)}
+textarea{resize:vertical;min-height:54px}
+
+.size-row{display:flex;flex-wrap:wrap;gap:8px}
+.size-opt{
+  border:1px solid var(--linha);background:transparent;color:var(--marfim);
+  border-radius:6px;padding:8px 12px;font-size:.85rem;font-weight:500;
+}
+.size-opt.sel{background:var(--ouro);color:var(--onyx);border-color:var(--ouro)}
+
+.upload-area{
+  border:1px dashed var(--linha-forte);border-radius:8px;padding:18px;text-align:center;
+  cursor:pointer;color:var(--texto-suave);font-size:.85rem;
+}
+.upload-area:hover{border-color:var(--ouro)}
+.preview-img{width:100%;border-radius:6px;margin-top:10px;display:none}
+
+.form-erro{color:#e6a4a4;font-size:.8rem;margin:-6px 0 12px;display:none}
+.form-erro.show{display:block}
+.form-ok{color:#8fd0a4;font-size:.8rem;margin:-6px 0 12px;display:none}
+.form-ok.show{display:block}
+
+.btn-salvar{
+  width:100%;border:none;border-radius:8px;padding:14px;font-size:.88rem;font-weight:600;
+  letter-spacing:.05em;color:var(--onyx);
+  background:linear-gradient(180deg,var(--champanhe),var(--ouro) 55%,var(--ouro-antigo));
+}
+.btn-salvar:hover{filter:brightness(1.06)}
+.btn-salvar:disabled{opacity:.5;cursor:not-allowed}
+.btn-cancelar{
+  width:100%;margin-top:8px;border:1px solid var(--linha);background:transparent;color:var(--texto-suave);
+  border-radius:8px;padding:11px;font-size:.82rem;
+}
+.btn-cancelar:hover{color:var(--marfim);border-color:var(--linha-forte)}
+
+/* ---------- LISTA DE PRODUTOS ---------- */
+.lista-produtos{display:flex;flex-direction:column;gap:14px}
+.item-produto{
+  display:flex;gap:14px;align-items:center;
+  background:linear-gradient(180deg,var(--carvao),#0e0d10);
+  border:1px solid var(--linha);border-radius:8px;padding:12px;
+}
+.item-produto .thumb{
+  width:64px;height:64px;border-radius:6px;object-fit:cover;flex-shrink:0;
+  background:#0c0b0e;border:1px solid var(--linha);
+}
+.item-produto .thumb.empty{display:flex;align-items:center;justify-content:center;color:var(--ouro);font-size:1.4rem}
+.item-produto .info{flex:1;min-width:0}
+.item-produto .nome{font-family:"Instrument Serif",serif;font-size:1.05rem;line-height:1.2}
+.item-produto .meta{font-size:.78rem;color:var(--texto-suave);margin-top:3px}
+.item-produto .preco{color:var(--ouro);font-family:"Gloock",serif;font-size:.95rem;margin-top:3px}
+.item-produto .acoes{display:flex;gap:8px;flex-shrink:0}
+.icon-btn{
+  width:34px;height:34px;border-radius:6px;border:1px solid var(--linha);background:transparent;
+  color:var(--texto-suave);display:flex;align-items:center;justify-content:center;
+}
+.icon-btn:hover{border-color:var(--ouro);color:var(--ouro)}
+.icon-btn.del:hover{border-color:#e6a4a4;color:#e6a4a4}
+.icon-btn svg{width:16px;height:16px}
+
+.vazio{color:var(--texto-suave);text-align:center;padding:30px 0;font-size:.9rem}

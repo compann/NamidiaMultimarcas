@@ -217,10 +217,11 @@ header {
 .hero h1 {
   font-family: var(--font-script);
   font-weight: 400;
-  font-size: clamp(4rem, 14vw, 8rem);
+  font-size: clamp(3.2rem, 11vw, 6.5rem);
   letter-spacing: 0.02em;
-  line-height: 1;
+  line-height: 1.15;
   margin: 0 0 2px;
+  padding: 0 12px;
   background: linear-gradient(
     170deg,
     #FDF0C0 0%,
@@ -250,12 +251,6 @@ header {
   color: transparent;
 }
 
-.hero-nome {
-  width: min(520px, 88vw);
-  margin: 14px auto 10px;
-  display: block;
-  filter: drop-shadow(0 4px 16px rgba(0,0,0,.7));
-}
 
 .hero .tagline {
   font-family: "Instrument Serif", serif;
@@ -485,11 +480,17 @@ footer img, footer .nm-logo {
   z-index: 1;
 }
 
-.footer-nome {
-  width: min(280px, 70vw);
+.footer-brand {
+  font-family: var(--font-script);
+  font-size: clamp(2rem, 7vw, 3.2rem);
+  font-weight: 400;
+  background: linear-gradient(170deg, #FDF0C0 0%, #E8C84C 20%, #D4AF37 45%, #F2DC70 60%, #C89520 80%, #9A7A1E 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   margin: 0 auto 18px;
   display: block;
-  filter: drop-shadow(0 2px 10px rgba(0,0,0,.6));
+  text-align: center;
   position: relative;
   z-index: 1;
 }

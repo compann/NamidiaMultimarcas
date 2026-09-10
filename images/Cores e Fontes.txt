@@ -1,0 +1,25 @@
+IDENTIDADE VISUAL — NA MÍDIA MULTIMARCAS
+==========================================
+
+CORES
+-----
+Preto Marca:        #181410
+Dourado Claro:      #e8c77e
+Dourado:            #c99c46
+Dourado Profundo:   #8a6423
+Branco Osso:        #f6f2ea
+
+Degradê dourado (textos):
+linear-gradient(170deg, #f6e2a4 0%, #e9c06a 35%, #c8933e 68%, #96682a 100%)
+
+FONTES (Google Fonts — gratuitas)
+---------------------------------
+Assinatura "Na Mídia":   Alex Brush   — https://fonts.google.com/specimen/Alex+Brush
+"MULTIMARCAS":           Marcellus    — https://fonts.google.com/specimen/Marcellus
+Textos e peças:          Montserrat   — https://fonts.google.com/specimen/Montserrat
+
+USO
+---
+- Logo dourada: sempre sobre fundos escuros.
+- Versão mono preta: fundos claros. Versão mono branca: fundos escuros coloridos.
+- "MULTIMARCAS" sempre em caixa alta com espaçamento amplo entre letras.

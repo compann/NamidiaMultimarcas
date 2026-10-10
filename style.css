@@ -600,6 +600,108 @@ footer {
 .float-wa:hover { transform: scale(1.08); }
 .float-wa svg { width: 28px; height: 28px; color: #fff; }
 
+/* ============================================================
+   IDENTIDADE VISUAL NAMIDIA — preto ônix + dourado
+   ============================================================ */
+:root {
+  --bg: #0b0908;
+  --fg: #f7efe1;
+  --primary: #c99432;
+  --primary-fg: #120e0a;
+  --card: #15110e;
+  --muted: #211a14;
+  --muted-fg: #b9a990;
+  --border: rgba(201, 148, 50, .26);
+  --border-strong: rgba(230, 183, 91, .55);
+  --sale: #b9892f;
+  --sale-fg: #120e0a;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.24);
+  --shadow: 0 10px 30px rgba(0,0,0,.32);
+  --shadow-lg: 0 18px 60px rgba(0,0,0,.48);
+}
+
+body {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(201,148,50,.10), transparent 28rem),
+    radial-gradient(circle at 90% 12%, rgba(201,148,50,.07), transparent 24rem),
+    var(--bg);
+}
+
+header {
+  background: rgba(11,9,8,.96);
+  border-bottom-color: rgba(201,148,50,.34);
+  box-shadow: 0 8px 24px rgba(0,0,0,.28);
+}
+
+.brand img { height: 46px; filter: drop-shadow(0 0 10px rgba(201,148,50,.18)); }
+.icon-btn { color: var(--fg); }
+.icon-btn:hover, .mainnav a:hover, .mainnav button:hover, .nav-menu button:hover { background: var(--muted); }
+.count-badge { background: var(--primary); color: var(--primary-fg); }
+
+.searchbar form, .search-mobile form {
+  background: #15110e;
+  border-color: var(--border);
+}
+.searchbar form:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(201,148,50,.14); }
+.searchbar input, .search-mobile input { color: var(--fg); }
+
+.mainnav { border-bottom-color: var(--border); }
+.mainnav a, .mainnav button { color: var(--fg); }
+.nav-menu { background: #15110e; border-color: var(--border); }
+
+.catalog { padding-top: 34px; }
+.catalog-title {
+  font-family: Georgia, 'Times New Roman', serif;
+  color: #f6d58f;
+  letter-spacing: .02em;
+}
+.catalog-title::after {
+  content: '';
+  display: block;
+  width: 74px;
+  height: 2px;
+  margin-top: 10px;
+  background: linear-gradient(90deg, var(--primary), transparent);
+}
+
+.tab, .size-chip, .sort-select, .btn-filter-mobile, .load-more {
+  background: #15110e;
+  border-color: var(--border);
+  color: var(--fg);
+}
+.tab:hover, .size-chip:hover, .load-more:hover { border-color: var(--primary); }
+.tab.active, .size-chip.sel { background: var(--primary); color: var(--primary-fg); border-color: var(--primary); }
+.sort-select:focus, .price-range input:focus { border-color: var(--primary); }
+
+.filters, .card, .sheet, .drawer, .modal, .search-mobile { background: #15110e; border-color: var(--border); }
+.card { box-shadow: var(--shadow-sm); }
+.card:hover { border-color: rgba(201,148,50,.65); box-shadow: 0 12px 30px rgba(0,0,0,.35), 0 0 0 1px rgba(201,148,50,.14); transform: translateY(-2px); }
+.card .thumb, .fav-card .thumb { background: #211a14; }
+.card .tag, .badge { background: var(--primary); color: var(--primary-fg); }
+.card .name, .sheet h2 { color: #f7efe1; }
+.btn-primary { background: var(--primary); color: var(--primary-fg); }
+.btn-primary:hover { background: #e0ad51; }
+.btn-outline { border-color: var(--border-strong); color: var(--fg); }
+.btn-outline:hover { background: var(--muted); border-color: var(--primary); }
+
+footer { background: #080706; border-top: 1px solid var(--border); }
+footer img { filter: none; }
+.foot-links a, .foot-social a { color: var(--muted-fg); }
+.foot-links a:hover { color: #f6d58f; }
+.float-wa { box-shadow: 0 8px 24px rgba(0,0,0,.4), 0 0 0 3px rgba(201,148,50,.20); }
+
+.overlay { background: rgba(0,0,0,.68); }
+.drawer-head, .sheet-head { border-bottom-color: var(--border); }
+.drawer-foot { border-top-color: var(--border); }
+.qty button { border-color: var(--border); }
+.qty button:hover { background: var(--muted); }
+.field input, .field textarea, .size-opt { background: #0f0c0a; border-color: var(--border); color: var(--fg); }
+.field input:focus, .field textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(201,148,50,.14); }
+
+@media (max-width: 767px) {
+  .brand img { height: 40px; max-width: 190px; object-fit: contain; }
+}
+
 /* ---------- OVERLAY / DRAWER / SHEET ---------- */
 .overlay {
   position: fixed;

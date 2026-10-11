@@ -22,6 +22,7 @@
 <link rel="stylesheet" href="brand.css?v=diamond-20261010">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
+<script src="estoque.js"></script>
 </head>
 <body>
 
@@ -358,10 +359,16 @@ async function carregarProdutos() {
       precoDe,
       imagem: p.imagem_url || "",
       tamanhos: Array.isArray(p.tamanhos) ? p.tamanhos : [],
+      estoque: normalizarEstoque(p.estoque, Array.isArray(p.tamanhos) ? p.tamanhos : []),
     };
   });
 
   montarTabs();
+  const sacolaValidada = validarSacola(cart, PRODUTOS);
+  if (JSON.stringify(sacolaValidada) !== JSON.stringify(cart)) {
+    cart = sacolaValidada; persistCart();
+    toast('Sua sacola foi ajustada ao estoque disponível.');
+  }
   montarFiltros();
   montarNavCategorias();
   render();
@@ -535,6 +542,7 @@ function cardEl(p) {
         ${p.precoDe ? `<span class="price-old">${fmt(p.precoDe)}</span>` : ""}
       </div>
       ${p.tamanhos.length ? `<span class="sizes-line">Tam.: ${p.tamanhos.map(esc).join(" · ")}</span>` : ""}
+      ${p.tamanhos.length ? `<span class="stock-line">Estoque: ${p.tamanhos.map(t => `${esc(t)}: ${p.estoque[t] || 0}`).join(" · ")}</span>` : ""}
       <button class="btn-buy" data-buy="${p.id}">Comprar</button>
     </div>`;
   el.querySelector("[data-fav]").onclick = () => toggleFav(p.id);
@@ -623,6 +631,16 @@ function renderFavoritos() {
 
 /* ---- folha "adicionar à sacola" ---- */
 let sheetProd = null, sheetSize = null, sheetQty = 1;
+function atualizarQuantidade() {
+  const restante = restanteEstoque(sheetProd, sheetSize, cart);
+  sheetQty = restante ? Math.min(Math.max(1, sheetQty), restante) : 0;
+  $('#s-qty').textContent = sheetQty;
+  $('#s-qminus').disabled = sheetQty <= 1;
+  $('#s-qplus').disabled = sheetQty >= restante;
+  $('#s-add').disabled = !restante;
+  $('#s-err').textContent = !sheetSize ? 'Escolha um tamanho para continuar.' : restante ? `${restante} unidade(s) disponível(is) para adicionar.` : 'Limite de estoque atingido para este tamanho.';
+  $('#s-err').classList.add('show');
+}
 
 function abrirSheet(id) {
   sheetProd = PRODUTOS.find(p => p.id === String(id));
@@ -646,10 +664,13 @@ function abrirSheet(id) {
       b.type = "button";
       b.className = "size-opt";
       b.textContent = t;
+      b.disabled = !disponivel(sheetProd.estoque, t);
+      b.title = b.disabled ? "Sem estoque" : `${sheetProd.estoque[t]} disponível(is)`;
       b.onclick = () => {
         sheetSize = t;
+        sheetQty = 1;
         sr.querySelectorAll(".size-opt").forEach(o => o.classList.toggle("sel", o === b));
-        $("#s-err").classList.remove("show");
+        atualizarQuantidade();
       };
       sr.appendChild(b);
     });
@@ -658,15 +679,16 @@ function abrirSheet(id) {
   }
 
   sheetWrap.classList.add("open");
+  atualizarQuantidade();
   lockScroll(true);
 }
 
-$("#s-qminus").onclick = () => { sheetQty = Math.max(1, sheetQty - 1); $("#s-qty").textContent = sheetQty; };
-$("#s-qplus").onclick  = () => { sheetQty++; $("#s-qty").textContent = sheetQty; };
+$("#s-qminus").onclick = () => { sheetQty--; atualizarQuantidade(); };
+$("#s-qplus").onclick = () => { sheetQty++; atualizarQuantidade(); };
 
 $("#s-add").onclick = () => {
   if (sheetProd.tamanhos.length && !sheetSize) { $("#s-err").classList.add("show"); return; }
-  addAoCarrinho(sheetProd, sheetSize, sheetQty);
+  if (!addAoCarrinho(sheetProd, sheetSize, sheetQty)) { atualizarQuantidade(); return; }
   sheetWrap.classList.remove("open");
   toast("Adicionado à sacola");
   renderCarrinho();
@@ -678,11 +700,13 @@ sheetWrap.onclick = e => { if (e.target === sheetWrap) { sheetWrap.classList.rem
 
 /* ---- sacola ---- */
 function addAoCarrinho(p, size, qty) {
+  if (!Number.isSafeInteger(qty) || qty < 1 || qty > restanteEstoque(p, size, cart)) return false;
   const key = p.id + "|" + (size || "");
   const found = cart.find(i => (i.id + "|" + (i.size || "")) === key);
   if (found) found.qty += qty;
   else cart.push({ id: p.id, nome: p.nome, preco: p.preco, size: size || "", imagem: p.imagem, qty });
   persistCart();
+  return true;
 }
 
 function persistCart() { salvarLS("nm_cart", cart); atualizarBadges(); }
@@ -705,7 +729,7 @@ function renderCarrinho() {
         <div class="qty">
           <button data-dec="${idx}" aria-label="Diminuir">−</button>
           <span>${i.qty}</span>
-          <button data-inc="${idx}" aria-label="Aumentar">+</button>
+          <button data-inc="${idx}" aria-label="Aumentar" ${restanteEstoque(PRODUTOS.find(p => p.id === i.id), i.size, cart) ? '' : 'disabled'}>+</button>
         </div>
       </div>
       <div class="ci-right">
@@ -715,18 +739,35 @@ function renderCarrinho() {
     </div>`).join("");
   $("#cart-total-val").textContent = fmt(totalCarrinho());
 
-  body.querySelectorAll("[data-inc]").forEach(b => b.onclick = () => { cart[+b.dataset.inc].qty++; persistCart(); renderCarrinho(); });
+  body.querySelectorAll("[data-inc]").forEach(b => b.onclick = () => { const i = cart[+b.dataset.inc]; if (restanteEstoque(PRODUTOS.find(p => p.id === i.id), i.size, cart) > 0) i.qty++; persistCart(); renderCarrinho(); });
   body.querySelectorAll("[data-dec]").forEach(b => b.onclick = () => { const i = cart[+b.dataset.dec]; i.qty = Math.max(1, i.qty - 1); persistCart(); renderCarrinho(); });
   body.querySelectorAll("[data-del]").forEach(b => b.onclick = () => { cart.splice(+b.dataset.del, 1); persistCart(); renderCarrinho(); });
 }
 
-$("#cart-checkout").onclick = () => {
+$("#cart-checkout").onclick = async () => {
   const nome = $("#cart-nome").value.trim();
   const obs  = $("#cart-obs").value.trim();
   const err  = $("#cart-err");
   if (!cart.length) return;
   if (!nome) { err.textContent = "Preencha seu nome para continuar."; err.classList.add("show"); return; }
   err.classList.remove("show");
+
+  const botao = $('#cart-checkout');
+  botao.disabled = true;
+  try {
+    const {data, error} = await supabaseClient.from('produtos').select('id,tamanhos,estoque').eq('ativo', true).in('id', [...new Set(cart.map(i => i.id))]);
+    if (error) throw error;
+    const atualizada = validarSacola(cart, data || []);
+    if (JSON.stringify(atualizada) !== JSON.stringify(cart)) {
+      cart = atualizada; persistCart(); renderCarrinho();
+      toast('O estoque mudou. Revise as quantidades da sacola antes de enviar.');
+      return;
+    }
+  } catch {
+    err.textContent = 'Não foi possível confirmar o estoque. Tente novamente.';
+    err.classList.add('show');
+    return;
+  } finally { botao.disabled = false; }
 
   let msg = "Olá! Quero fazer um pedido na *Na Mídia Multimarcas* 🛍️\n\n";
   cart.forEach((i, n) => {
@@ -741,7 +782,7 @@ $("#cart-checkout").onclick = () => {
   } else {
     msg += `\n\nPode me enviar a chave PIX para concluir o pagamento? 💛`;
   }
-  window.open(waBase + "?text=" + encodeURIComponent(msg), "_blank");
+  window.location.href = waBase + "?text=" + encodeURIComponent(msg);
 };
 
 /* ---- badges + overlays ---- */

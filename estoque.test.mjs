@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import stock from './estoque.js';
+const {normalizarEstoque, restanteEstoque, validarSacola} = stock;
+const p = {id: '1', tamanhos: ['P','M','G'], estoque: {P:2,M:4,G:0}};
+assert.deepEqual(normalizarEstoque({P:-1,M:2.5,G:'3'},p.tamanhos),{P:0,M:0,G:3});
+assert.equal(restanteEstoque(p,'P',[]),2);
+assert.equal(restanteEstoque(p,'P',[{id:'1',size:'P',qty:2}]),0);
+assert.equal(restanteEstoque(p,'M',[{id:'1',size:'P',qty:2}]),4);
+assert.equal(restanteEstoque(p,'G',[]),0);
+assert.equal(restanteEstoque(p,'X',[]),0);
+assert.equal(restanteEstoque(undefined,'P',[]),0);
+assert.deepEqual(validarSacola([{id:'1',size:'P',qty:99}], [p]),[{id:'1',size:'P',qty:2}]);
+assert.deepEqual(validarSacola([{id:'1',size:'P',qty:2},{id:'1',size:'P',qty:2}], [p]),[{id:'1',size:'P',qty:2}]);
+assert.deepEqual(validarSacola([{id:'1',size:'P',qty:1}], []),[]);
+assert.deepEqual(validarSacola([{id:'1',size:'G',qty:1}], [p]),[]);
+assert.deepEqual(validarSacola([{id:'1',size:'P',qty:-2}], [p]),[]);
+console.log('11 verificações de estoque passaram.');

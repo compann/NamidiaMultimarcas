@@ -1,4 +1,6 @@
 /* Approved diamond identity. Neutral black surfaces; gold reserved for accents. */
+button:disabled { opacity: .45; cursor: not-allowed; }
+#s-err { color: var(--muted-fg); }
 :root {
   --bg: #090909; --fg: #f5f5f5; --card: #101010;
   --muted: #1a1a1a; --muted-fg: #b5b5b5;

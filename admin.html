@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="admin.css">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
+<script src="estoque.js"></script>
 </head>
 <body class="admin-body">
 
@@ -86,6 +87,8 @@
           <button type="button" class="size-opt" data-t="GG">GG</button>
           <button type="button" class="size-opt" data-t="G1">G1</button>
         </div>
+        <div class="stock-row" id="f-estoque"></div>
+        <p class="field-hint">Informe o estoque individual de cada tamanho. O estoque só é alterado por este painel.</p>
       </div>
 
       <p class="form-erro" id="form-erro"></p>
@@ -193,11 +196,16 @@ async function fazerUploadFoto(){
 
 // ---------- TAMANHOS (seleção múltipla) ----------
 const tamanhosSel = new Set();
+const estoqueInputs = document.getElementById("f-estoque");
+function renderEstoqueInputs(estoque = {}){
+  estoqueInputs.innerHTML = [...tamanhosSel].map(t => `<label class="stock-item">${t}<input type="number" min="0" step="1" data-estoque="${t}" value="${Number(estoque[t]) >= 0 ? Number(estoque[t]) : 0}"></label>`).join("");
+}
 document.querySelectorAll("#f-tamanhos .size-opt").forEach(btn=>{
   btn.onclick = ()=>{
     const t = btn.dataset.t;
     if(tamanhosSel.has(t)){ tamanhosSel.delete(t); btn.classList.remove("sel"); }
     else { tamanhosSel.add(t); btn.classList.add("sel"); }
+    renderEstoqueInputs(Object.fromEntries([...estoqueInputs.querySelectorAll('[data-estoque]')].map(i => [i.dataset.estoque, i.value])));
   };
 });
 
@@ -214,6 +222,7 @@ function limparFormulario(){
   inputFoto.value = "";
   tamanhosSel.clear();
   document.querySelectorAll("#f-tamanhos .size-opt").forEach(b=>b.classList.remove("sel"));
+  estoqueInputs.innerHTML = "";
   document.getElementById("form-erro").classList.remove("show");
   document.getElementById("form-ok").classList.remove("show");
   document.getElementById("btn-cancelar").style.display = "none";
@@ -234,6 +243,7 @@ document.getElementById("btn-salvar").onclick = async ()=>{
   const preco = parseFloat(document.getElementById("f-preco").value);
   const precoDeRaw = parseFloat(document.getElementById("f-preco-de").value);
   const preco_de = (!isNaN(precoDeRaw) && precoDeRaw > preco) ? precoDeRaw : null;
+  const estoque = normalizarEstoque(Object.fromEntries([...estoqueInputs.querySelectorAll("[data-estoque]")].map(input => [input.dataset.estoque, input.value])), [...tamanhosSel]);
 
   if(!nome || isNaN(preco) || preco <= 0 || tamanhosSel.size === 0){
     erroEl.textContent = "Preencha nome, preço e ao menos um tamanho.";
@@ -256,6 +266,7 @@ document.getElementById("btn-salvar").onclick = async ()=>{
     preco,
     preco_de,
     tamanhos: [...tamanhosSel],
+    estoque,
     ativo: true
   };
   if (imagem_url) payload.imagem_url = imagem_url;
@@ -323,6 +334,7 @@ async function carregarLista(){
       <div class="info">
         <div class="nome">${p.nome}</div>
         <div class="meta">${p.categoria} · ${(p.tamanhos||[]).join(", ")}${p.ativo ? "" : " · oculta"}</div>
+        <div class="meta">Estoque: ${Object.entries(normalizarEstoque(p.estoque, p.tamanhos||[])).map(([t,q]) => `${t}: ${q}`).join(" · ")}</div>
         <div class="preco">
           R$ ${Number(p.preco).toFixed(2).replace(".",",")}
           ${(p.preco_de && Number(p.preco_de) > Number(p.preco))
@@ -361,6 +373,7 @@ function editarProduto(p){
     b.classList.toggle("sel", sel);
     if (sel) tamanhosSel.add(b.dataset.t);
   });
+  renderEstoqueInputs(normalizarEstoque(p.estoque, p.tamanhos || []));
   if (p.imagem_url){
     previewImg.src = p.imagem_url;
     previewImg.style.display = "block";

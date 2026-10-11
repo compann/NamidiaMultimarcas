@@ -478,6 +478,7 @@ header {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.card .stock-line { display:block; margin-top:5px; color:var(--muted-fg); font-size:.75rem; }
 
 .btn-buy {
   margin-top: 10px;
@@ -1032,6 +1033,7 @@ footer img { max-width: 230px; height: auto; }
 }
 .size-opt:hover { border-color: var(--primary); }
 .size-opt.sel { background: var(--primary); color: var(--primary-fg); border-color: var(--primary); }
+.size-opt:disabled { opacity:.45; cursor:not-allowed; text-decoration:line-through; }
 
 .sheet-qty-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
 .sheet-qty-row .s-label { margin-bottom: 0; }

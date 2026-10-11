@@ -16,6 +16,7 @@ create table if not exists public.produtos (
   preco      numeric     not null,
   preco_de   numeric,                       -- preço "De" (riscado). Vazio = sem desconto
   tamanhos   text[]      not null default '{}',
+  estoque    jsonb       not null default '{}'::jsonb,
   imagem_url text,
   ativo      boolean     not null default true,
   criado_em  timestamptz not null default now()
@@ -23,6 +24,7 @@ create table if not exists public.produtos (
 
 -- garante a coluna de desconto mesmo se a tabela já existir de antes
 alter table public.produtos add column if not exists preco_de numeric;
+alter table public.produtos add column if not exists estoque jsonb not null default '{}'::jsonb;
 
 -- 2. SEGURANÇA (RLS) DA TABELA -----------------------------------------
 alter table public.produtos enable row level security;

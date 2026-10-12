@@ -3,9 +3,11 @@
 --  Cole tudo no SQL Editor do Supabase e clique em RUN.
 --  Pode rodar mais de uma vez sem problema (é idempotente).
 --
---  Depois de rodar, ainda falta 1 passo MANUAL no painel:
+--  Depois de rodar, cadastre a única conta de administrador:
 --  Authentication -> Users -> Add user -> (e-mail + senha + Auto Confirm)
 --  Esse e-mail/senha é o login do admin.html.
+--  Em seguida execute supabase-security.sql para autorizar essa conta
+--  e criar as consultas públicas seguras. Não habilite cadastro público.
 -- ============================================================
 
 -- 1. TABELA DE PRODUTOS ---------------------------------------------------
@@ -29,44 +31,20 @@ alter table public.produtos add column if not exists estoque jsonb not null defa
 -- 2. SEGURANÇA (RLS) DA TABELA -----------------------------------------
 alter table public.produtos enable row level security;
 
-drop policy if exists "loja le produtos ativos" on public.produtos;
-create policy "loja le produtos ativos"
-  on public.produtos for select
-  to anon, authenticated
-  using (ativo = true);
-
-drop policy if exists "admin gerencia produtos" on public.produtos;
-create policy "admin gerencia produtos"
-  on public.produtos for all
-  to authenticated
-  using (true) with check (true);
+-- Não recriar políticas públicas na tabela. O acesso ao catálogo ocorre
+-- por catalogo_publico(), e ao painel apenas por eh_admin().
+-- As políticas são geridas exclusivamente por supabase-security.sql.
 
 -- 3. BUCKET DAS FOTOS --------------------------------------------------
 insert into storage.buckets (id, name, public)
 values ('produtos', 'produtos', true)
 on conflict (id) do update set public = true;
 
--- 4. SEGURANÇA DAS FOTOS ---------------------------------------------
+-- 4. LEITURA PÚBLICA DAS FOTOS DO CATÁLOGO -----------------------------
 drop policy if exists "fotos leitura publica" on storage.objects;
 create policy "fotos leitura publica"
   on storage.objects for select
   to anon, authenticated
   using (bucket_id = 'produtos');
 
-drop policy if exists "fotos admin insert" on storage.objects;
-create policy "fotos admin insert"
-  on storage.objects for insert
-  to authenticated
-  with check (bucket_id = 'produtos');
-
-drop policy if exists "fotos admin update" on storage.objects;
-create policy "fotos admin update"
-  on storage.objects for update
-  to authenticated
-  using (bucket_id = 'produtos');
-
-drop policy if exists "fotos admin delete" on storage.objects;
-create policy "fotos admin delete"
-  on storage.objects for delete
-  to authenticated
-  using (bucket_id = 'produtos');
+-- Escrita das fotos: somente o administrador em supabase-security.sql.

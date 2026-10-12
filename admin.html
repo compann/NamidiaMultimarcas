@@ -26,7 +26,7 @@
   <label for="login-email">E-mail</label>
   <input type="text" id="login-email" autocomplete="username">
   <label for="login-senha">Senha</label>
-  <input type="text" id="login-senha" autocomplete="current-password" style="-webkit-text-security:disc;text-security:disc">
+  <input type="password" id="login-senha" autocomplete="current-password">
   <button class="btn-gold" id="btn-login">Entrar</button>
   <p class="login-erro" id="login-erro"></p>
 </div>
@@ -75,7 +75,11 @@
       <div class="field">
         <label for="f-preco-de">Preço "De" (R$) — opcional</label>
         <input type="number" id="f-preco-de" step="0.01" min="0" placeholder="Ex.: 159.90">
-        <p class="field-hint">Preço antigo, que aparece riscado no card com o selo de desconto. Deixe vazio se não houver promoção.</p>
+        <p class="field-hint">Preço antigo, que aparece riscado no card com o selo de desconto. Deixe vazio se não houver desconto.</p>
+      </div>
+      <div class="field">
+        <label class="promo-option"><input type="checkbox" id="f-promocao" style="width:auto"> Exibir na aba Promoção</label>
+        <p class="field-hint">Marque para destacar esta camiseta na aba Promoção. O preço de venda é o valor informado acima.</p>
       </div>
 
       <div class="field">
@@ -110,6 +114,9 @@
 </div>
 
 <script>
+function escAdmin(value) {
+  return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 const LOGO_SRC = "images/namidia-aprovada.png";
 ["selo-login","selo-top"].forEach(id=>{
   const el = document.getElementById(id);
@@ -156,7 +163,14 @@ document.getElementById("btn-sair").onclick = async ()=>{
   loginBox.style.display = "block";
 };
 
-function mostrarDashboard(user){
+async function mostrarDashboard(user){
+  const {data:admin,error} = await supabaseClient.rpc('eh_admin');
+  if (error || admin !== true) {
+    await supabaseClient.auth.signOut();
+    shell.classList.remove('open'); loginBox.style.display = 'block';
+    document.getElementById('login-erro').textContent = 'Acesso não autorizado para administrar a loja.';
+    return;
+  }
   loginBox.style.display = "none";
   shell.classList.add("open");
   document.getElementById("user-email").textContent = user.email;
@@ -198,7 +212,7 @@ async function fazerUploadFoto(){
 const tamanhosSel = new Set();
 const estoqueInputs = document.getElementById("f-estoque");
 function renderEstoqueInputs(estoque = {}){
-  estoqueInputs.innerHTML = [...tamanhosSel].map(t => `<label class="stock-item">${t}<input type="number" min="0" step="1" data-estoque="${t}" value="${Number(estoque[t]) >= 0 ? Number(estoque[t]) : 0}"></label>`).join("");
+  estoqueInputs.innerHTML = [...tamanhosSel].map(t => `<label class="stock-item">${escAdmin(t)}<input type="number" min="0" step="1" data-estoque="${escAdmin(t)}" value="${Number.isSafeInteger(Number(estoque[t])) && Number(estoque[t]) >= 0 ? Number(estoque[t]) : 0}"></label>`).join("");
 }
 document.querySelectorAll("#f-tamanhos .size-opt").forEach(btn=>{
   btn.onclick = ()=>{
@@ -217,6 +231,7 @@ function limparFormulario(){
   document.getElementById("f-categoria").value = "";
   document.getElementById("f-preco").value = "";
   document.getElementById("f-preco-de").value = "";
+  document.getElementById("f-promocao").checked = false;
   previewImg.style.display = "none";
   previewImg.src = "";
   inputFoto.value = "";
@@ -265,6 +280,7 @@ document.getElementById("btn-salvar").onclick = async ()=>{
     categoria,
     preco,
     preco_de,
+    promocao: document.getElementById("f-promocao").checked,
     tamanhos: [...tamanhosSel],
     estoque,
     ativo: true
@@ -327,14 +343,14 @@ async function carregarLista(){
     const item = document.createElement("div");
     item.className = "item-produto";
     const thumb = p.imagem_url
-      ? `<img class="thumb" src="${p.imagem_url}" alt="">`
+      ? `<img class="thumb" src="${escAdmin(p.imagem_url)}" alt="">`
       : `<div class="thumb empty">+</div>`;
     item.innerHTML = `
       ${thumb}
       <div class="info">
-        <div class="nome">${p.nome}</div>
-        <div class="meta">${p.categoria} · ${(p.tamanhos||[]).join(", ")}${p.ativo ? "" : " · oculta"}</div>
-        <div class="meta">Estoque: ${Object.entries(normalizarEstoque(p.estoque, p.tamanhos||[])).map(([t,q]) => `${t}: ${q}`).join(" · ")}</div>
+        <div class="nome">${escAdmin(p.nome)}</div>
+        <div class="meta">${escAdmin(p.categoria)} · ${(p.tamanhos||[]).map(escAdmin).join(", ")}${p.ativo ? "" : " · oculta"}${p.promocao ? " · Promoção" : ""}</div>
+        <div class="meta">Estoque: ${Object.entries(normalizarEstoque(p.estoque, p.tamanhos||[])).map(([t,q]) => `${escAdmin(t)}: ${q}`).join(" · ")}</div>
         <div class="preco">
           R$ ${Number(p.preco).toFixed(2).replace(".",",")}
           ${(p.preco_de && Number(p.preco_de) > Number(p.preco))
@@ -367,6 +383,7 @@ function editarProduto(p){
   document.getElementById("f-categoria").value = p.categoria;
   document.getElementById("f-preco").value = p.preco;
   document.getElementById("f-preco-de").value = p.preco_de ?? "";
+  document.getElementById("f-promocao").checked = p.promocao === true;
   tamanhosSel.clear();
   document.querySelectorAll("#f-tamanhos .size-opt").forEach(b=>{
     const sel = (p.tamanhos||[]).includes(b.dataset.t);

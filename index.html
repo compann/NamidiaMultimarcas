@@ -387,9 +387,14 @@ function listaFiltrada() {
     const q = filtros.busca.toLowerCase();
     l = l.filter(p => p.nome.toLowerCase().includes(q) || p.categoria.toLowerCase().includes(q));
   }
-  if (filtros.ordenar === "menor") l.sort((a, b) => a.preco - b.preco);
-  else if (filtros.ordenar === "maior") l.sort((a, b) => b.preco - a.preco);
-  else if (filtros.ordenar === "az") l.sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+  let comparar = () => 0;
+  if (filtros.ordenar === "menor") comparar = (a, b) => a.preco - b.preco;
+  else if (filtros.ordenar === "maior") comparar = (a, b) => b.preco - a.preco;
+  else if (filtros.ordenar === "az") comparar = (a, b) => a.nome.localeCompare(b.nome, "pt-BR");
+  l.sort((a, b) => {
+    const disponibilidade = Number(a.tamanhos.length === 0) - Number(b.tamanhos.length === 0);
+    return disponibilidade || comparar(a, b);
+  });
   return l;
 }
 

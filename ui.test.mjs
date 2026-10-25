@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
 const html=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
-assert.match(html,/property="og:image" content="https:\/\/compann\.github\.io\/NamidiaMultimarcas\/images\/preview-whatsapp\.png\?v=2"/);
+assert.match(html,/property="og:image" content="https:\/\/compann\.github\.io\/NamidiaMultimarcas\/images\/preview-whatsapp\.png\?v=3"/);
 assert.match(html,/property="og:image:width" content="1200"/);
 assert.match(html,/property="og:image:height" content="630"/);
 const preview=fs.readFileSync(new URL('./images/preview-whatsapp.png',import.meta.url));

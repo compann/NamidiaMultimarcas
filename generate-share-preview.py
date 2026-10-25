@@ -2,11 +2,11 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 ROOT = Path(__file__).parent
-SOURCE = ROOT / "images" / "02 - Logo Horizontal.png"
+SOURCE = ROOT / "images" / "namidia-aprovada.png"
 OUTPUT = ROOT / "images" / "preview-whatsapp.png"
 W, H = 1200, 630
 
-canvas = Image.new("RGB", (W, H), "#0d0b08")
+canvas = Image.new("RGB", (W, H), "#090909")
 
 # Luz dourada discreta para manter a identidade da marca sem prejudicar a leitura.
 glow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -15,9 +15,9 @@ gd.ellipse((250, -260, 950, 440), fill=(185, 113, 18, 38))
 glow = glow.filter(ImageFilter.GaussianBlur(95))
 canvas = Image.alpha_composite(canvas.convert("RGBA"), glow)
 
-logo = Image.open(SOURCE).convert("RGB")
+logo = Image.open(SOURCE).convert("RGBA")
 logo.thumbnail((1060, 405), Image.Resampling.LANCZOS)
-canvas.paste(logo, ((W - logo.width) // 2, 42))
+canvas.alpha_composite(logo, ((W - logo.width) // 2, 64))
 
 draw = ImageDraw.Draw(canvas)
 gold = "#d6a94f"
